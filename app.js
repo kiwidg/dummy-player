@@ -96,7 +96,8 @@ async.each(folders, function(item, callback) {
 });
 
 watchr.watch({path: absoluteDir, listener: function(changeType, fullPath, currentStat, previousStat) {
-    folder = fullPath.split('/')[6];
+    indexOfFolder = absoluteDir.split('/').length-1;
+    folder = fullPath.split('/')[indexOfFolder];
     console.log(folder);
     newPlaylist(folder, function(err, playlist){
         if(!err) {
