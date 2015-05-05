@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "morgan": "~1.5.2",
     "watchr": "~2.4.13",
     "node-dir": "~0.1.8",
     "id3js": "~1.1.3",
