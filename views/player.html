@@ -1,0 +1,174 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <style>
+        body {
+            color: #666;
+            font-family: sans-serif;
+            line-height: 1.4;
+        }
+        
+        a {
+            color: #888;
+            text-decoration: none;
+        }
+        
+        #wrapper {
+            width: 500px;
+            margin: 40px auto;
+        }
+        
+        .audiojs {
+            margin: 20px auto;
+        }
+        
+        ol {
+            padding: 0px;
+            margin: 0px;
+            list-style: decimal-leading-zero inside;
+            color: #ccc;
+            width: 560px;
+            border-top: 1px solid #ccc;
+            font-size: 0.9em;
+        }
+        
+        ol li {
+            position: relative;
+            margin: 0px;
+            padding: 9px 2px 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        
+        ol li a {
+            text-indent: -3.3ex;
+        }
+        
+        ol li a:hover {
+            color: #000;
+        }
+        
+        ol li a:last-child {
+            float: right;
+        }
+
+        li.playing {
+            color: #aaa;
+            text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.3);
+        }
+        
+        li.playing a:first-child {
+            color: #000;
+        }
+        
+        li.playing:before {
+            content: '♬';
+            width: 14px;
+            height: 14px;
+            padding: 3px;
+            line-height: 14px;
+            margin: 0px;
+            position: absolute;
+            left: -24px;
+            top: 9px;
+            color: #000;
+            font-size: 13px;
+            text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.2);
+        }
+        
+        @media screen and (max-device-width: 480px) {
+            #wrapper {
+                position: relative;
+                left: -3%;
+            }
+        }
+    </style>
+    <meta charset="UTF-8" />
+    <title>Lecteur de test</title>
+    <script src="/audiojs/audio.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script>
+        $(function()
+        {
+            // Setup the player to autoplay the next track
+            var a = audiojs.createAll(
+            {
+                trackEnded: function()
+                {
+                    var next = $('ol li.playing').next();
+                    if (!next.length) next = $('ol li').first();
+                    next.addClass('playing').siblings().removeClass(
+                        'playing');
+                    audio.load($('a', next).attr(
+                        'data-src'));
+                    audio.play();
+                }
+            });
+
+            // Load in the first track
+            var audio = a[0];
+            first = $('ol a').attr('data-src');
+            $('ol li').first().addClass('playing');
+            audio.load(first);
+
+            // Load in a track on click
+            $('ol li a[href="#"]').click(function(e)
+            {
+                e.preventDefault();
+                $(this).parent().addClass('playing').siblings()
+                    .removeClass('playing');
+                audio.load($(this).attr('data-src'));
+                audio.play();
+            });
+            // Keyboard shortcuts
+            $(document).keydown(function(e)
+            {
+                var unicode = e.charCode ? e.charCode : e.keyCode;
+                // right arrow
+                if (unicode == 39)
+                {
+                    var next = $('li.playing').next();
+                    if (!next.length) next = $('ol li').first();
+                    $(':first-child', next).click();
+                    // back arrow
+                }
+                else if (unicode == 37)
+                {
+                    var prev = $('li.playing').prev();
+                    if (!prev.length) prev = $('ol li').last();
+                    $(':first-child', prev).click();
+                    // spacebar
+                }
+                else if (unicode == 32)
+                {
+                    audio.playPause();
+                }
+            })
+            $('select').change(function()
+            {
+                folder = $('option:selected').text();
+                $(location).attr('href', '/?folder=' + folder);
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div id="wrapper">
+        <h3>Dossier : </h3>
+        <select>
+        {% for folder in folders %}
+            <option {% if folder == currentFolder %}selected="selected" {% endif %}>{{ folder }}</option>
+            {% endfor %}
+        </select>
+        <audio preload></audio>
+        <ol>
+            {% for song in playlist %}
+            <li><a href="#" data-src="{{ song.path }}">{{ song.title }} - {{ song.artist }}</a>
+                <a href="{{song.path}}" download>Download</a>
+            </li>
+            {% endfor %}
+        </ol>
+</body>
+
+</html>
