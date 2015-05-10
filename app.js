@@ -3,12 +3,14 @@ var app = express();
 var logger = require('morgan');
 var fs = require('fs');
 var dir = require('node-dir');
-var id3 = require('id3js');
+var id3 = require('musicmetadata');
 var async = require('async');
 var swig = require('swig');
 var session = require('express-session');
 var watchr = require('watchr');
 
+// Set this if your application appears in a subfolder (for instance if you use an Apache proxy that matches yoursite.com/dummy-player/, you'll use PREFIX = "/dummy-player"
+var PREFIX = "/player";
 app.use(session({
     secret: '1234567890QWERTY',
     resave: false,
@@ -51,10 +53,7 @@ function newPlaylist(folder, callback) {
             callback('Files error : ' + err, null);
         } else {
             async.each(files, function(file, call) {
-                id3({
-                    file: file,
-                    type: id3.OPEN_LOCAL
-                }, function(error, tags) {
+                id3(fs.createReadStream(file), function(error, tags) {
                     if (error) {
                         call('ID3 error : ' + error);
                     } else {
@@ -116,7 +115,8 @@ app.get('/', function(req, res) {
     res.render('player', {
         playlist: playlists[searchInArray(playlists, req.session.folder)].playlist,
         currentFolder: req.session.folder,
-        folders: folders
+        folders: folders,
+        base: PREFIX
     });
 });
 

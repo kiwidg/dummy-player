@@ -85,7 +85,7 @@
     </style>
     <meta charset="UTF-8" />
     <title>Lecteur de test</title>
-    <script src="/audiojs/audio.min.js"></script>
+    <script src="{{ base }}/audiojs/audio.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script>
         $(function()
@@ -164,8 +164,8 @@
         <audio preload></audio>
         <ol>
             {% for song in playlist %}
-            <li><a href="#" data-src="{{ song.path }}">{{ song.title }} - {{ song.artist }}</a>
-                <a href="{{song.path}}" download>Download</a>
+            <li><a href="#" data-src="{{base}}{{ song.path }}">{{ song.title }} - {{ song.artist }}</a>
+                <a href="{{base}}{{song.path}}" download>Download</a>
             </li>
             {% endfor %}
         </ol>
